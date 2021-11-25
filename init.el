@@ -6,9 +6,8 @@
 (set-fringe-mode 10)
 
 (menu-bar-mode -1)
-(setq visible-bell t)
 
-(set-face-attribute 'default nil :font "Fira Code Retina" :height 100)
+;;(set-face-attribute 'default nil :font "Fira Code Retina" :height 100)
 
 (load-theme 'tango-dark)
 
@@ -25,12 +24,16 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+(use-package key-chord)
+(key-chord-mode 1)
+
 (use-package evil
   :init      ;; tweak evil's configuration before loading it
   (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   (setq evil-want-keybinding nil)
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
+  (setq evil-want-C-u-scroll t)
   (evil-mode))
 (use-package evil-collection
   :after evil
@@ -48,6 +51,13 @@
 ;; Setting garbage collection threshold
 (setq gc-cons-threshold 402653184
       gc-cons-percentage 0.6)
+
+(use-package ergoemacs-status)
+(ergoemacs-status-mode)    
+(use-package powerline)
+(powerline-nano-theme)
+(powerline-raw mode-line-mule-info nil 'l)
+
 
 ;; Profile emacs startup
 (add-hook 'emacs-startup-hook
@@ -74,7 +84,7 @@
   (setq dashboard-set-file-icons t)
   (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")
   ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-  (setq dashboard-startup-banner "~/.emacs.d/mayu.png")  ;; use custom image as banner
+  (setq dashboard-startup-banner "~/.emacs.d/sinon.png")  ;; use custom image as banner
   (setq dashboard-center-content nil) ;; set to 't' for centered content
   (setq dashboard-items '((recents . 5)
                           (agenda . 5 )
@@ -98,6 +108,8 @@
 (use-package all-the-icons-dired)
 (use-package dired-open)
 (use-package peep-dired)
+
+(use-package elcord)
 
 (nvmap :states '(normal visual) :keymaps 'override :prefix "SPC"
                "d d" '(dired :which-key "Open dired")
@@ -137,18 +149,18 @@
   :config
   (recentf-mode))
 (use-package sudo-edit) ;; Utilities for opening files with sudo
-(set-face-attribute 'default nil
-  :font "Source Code Pro"
-  :height 110
-  :weight 'medium)
-(set-face-attribute 'variable-pitch nil
-  :font "Ubuntu Nerd Font"
-  :height 120
-  :weight 'medium)
-(set-face-attribute 'fixed-pitch nil
-  :font "Source Code Pro"
-  :height 110
-  :weight 'medium)
+;;(set-face-attribute 'default nil
+;;  :font "Source Code Pro"
+;;  :height 110
+;;  :weight 'medium)
+;;(set-face-attribute 'variable-pitch nil
+;;  :font "Ubuntu Nerd Font"
+;;  :height 120
+;;  :weight 'medium)
+;;(set-face-attribute 'fixed-pitch nil
+;;  :font "Source Code Pro"
+;;  :height 110
+;;  :weight 'medium)
 ;; Makes commented text and keywords italics.
 ;; This is working in emacsclient but not emacs.
 ;; Your font must have an italic face available.
@@ -164,3 +176,253 @@
 (add-to-list 'default-frame-alist '(font . "Source Code Pro-11"))
 ;; changes certain keywords to symbols, such as lamda!
 (setq global-prettify-symbols-mode t)
+(use-package recentf
+  :config
+  (recentf-mode))
+(use-package sudo-edit) ;; Utilities for opening files with sudo
+;; zoom in/out like we do everywhere else.
+(global-set-key (kbd "C-=") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
+(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+(nvmap :keymaps 'override :prefix "SPC"
+       "SPC"   '(counsel-M-x :which-key "M-x")
+       "c c"   '(compile :which-key "Compile")
+       "c C"   '(recompile :which-key "Recompile")
+       "h r r" '((lambda () (interactive) (load-file "~/.emacs.d/init.el")) :which-key "Reload emacs config")
+       "t t"   '(toggle-truncate-lines :which-key "Toggle truncate lines"))
+
+(nvmap :keymaps 'override :prefix "SPC"
+       "m *"   '(org-ctrl-c-star :which-key "Org-ctrl-c-star")
+       "m +"   '(org-ctrl-c-minus :which-key "Org-ctrl-c-minus")
+       "m ."   '(counsel-org-goto :which-key "Counsel org goto")
+       "m e"   '(org-export-dispatch :which-key "Org export dispatch")
+       "m f"   '(org-footnote-new :which-key "Org footnote new")
+       "m h"   '(org-toggle-heading :which-key "Org toggle heading")
+       "m i"   '(org-toggle-item :which-key "Org toggle item")
+       "m n"   '(org-store-link :which-key "Org store link")
+       "m o"   '(org-set-property :which-key "Org set property")
+       "m t"   '(org-todo :which-key "Org todo")
+       "m x"   '(org-toggle-checkbox :which-key "Org toggle checkbox")
+       "m B"   '(org-babel-tangle :which-key "Org babel tangle")
+       "m I"   '(org-toggle-inline-images :which-key "Org toggle inline imager")
+       "m T"   '(org-todo-list :which-key "Org todo list")
+       "o a"   '(org-agenda :which-key "Org agenda"))
+(global-display-line-numbers-mode 1)
+(global-visual-line-mode t)
+
+(use-package counsel
+  :after ivy
+  :config (counsel-mode))
+(use-package ivy
+  :defer 0.1
+  :diminish
+  :bind
+  (("C-c C-r" . ivy-resume)
+   ("C-x B" . ivy-switch-buffer-other-window))
+  :custom
+  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-use-virtual-buffers t)
+  (setq enable-recursive-minibuffers t)
+  :config
+  (ivy-mode))
+(use-package ivy-rich
+  :after ivy
+  :custom
+  (ivy-virtual-abbreviate 'full
+   ivy-rich-switch-buffer-align-virtual-buffer t
+   ivy-rich-path-style 'abbrev)
+  :config
+  (ivy-set-display-transformer 'ivy-switch-buffer
+                               'ivy-rich-switch-buffer-transformer)
+  (ivy-rich-mode 1)) ;; this gets us descriptions in M-x.
+(use-package swiper
+  :after ivy
+  :bind (("C-s" . swiper)
+         ("C-r" . swiper)))
+(setq ivy-initial-inputs-alist nil)
+(use-package smex)
+(smex-initialize)
+(use-package ivy-posframe
+  :init
+  (setq ivy-posframe-display-functions-alist
+    '((swiper                     . ivy-posframe-display-at-point)
+      (complete-symbol            . ivy-posframe-display-at-point)
+      (counsel-M-x                . ivy-display-function-fallback)
+      (counsel-esh-history        . ivy-posframe-display-at-window-center)
+      (counsel-describe-function  . ivy-display-function-fallback)
+      (counsel-describe-variable  . ivy-display-function-fallback)
+      (counsel-find-file          . ivy-display-function-fallback)
+      (counsel-recentf            . ivy-display-function-fallback)
+      (counsel-register           . ivy-posframe-display-at-frame-bottom-window-center)
+      (dmenu                      . ivy-posframe-display-at-frame-top-center)
+      (nil                        . ivy-posframe-display))
+    ivy-posframe-height-alist
+    '((swiper . 20)
+      (dmenu . 20)
+      (t . 10)))
+  :config
+  (ivy-posframe-mode 1)) ; 1 enables posframe-mode, 0 disables it.
+
+(use-package haskell-mode)
+(use-package lua-mode)
+(use-package markdown-mode)
+
+;; Function for setting a fixed width for neotree.
+;; Defaults to 25 but I make it a bit longer (35) in the 'use-package neotree'.
+(defcustom neo-window-width 25
+  "*Specifies the width of the NeoTree window."
+  :type 'integer
+  :group 'neotree)
+
+(use-package neotree
+  :config
+  (setq neo-smart-open t
+        neo-window-width 30
+        neo-theme (if (display-graphic-p) 'icons 'arrow)
+        ;;neo-window-fixed-size nil
+        inhibit-compacting-font-caches t
+        projectile-switch-project-action 'neotree-projectile-action) 
+        ;; truncate long file names in neotree
+        (add-hook 'neo-after-create-hook
+           #'(lambda (_)
+               (with-current-buffer (get-buffer neo-buffer-name)
+                 (setq truncate-lines t)
+                 (setq word-wrap nil)
+                 (make-local-variable 'auto-hscroll-mode)
+                 (setq auto-hscroll-mode nil)))))
+
+;; show hidden files
+(setq-default neo-show-hidden-files t)
+
+(nvmap :prefix "SPC"
+       "t n"   '(neotree-toggle :which-key "Toggle neotree file viewer")
+       "d n"   '(neotree-dir :which-key "Open directory in neotree"))
+(add-hook 'org-mode-hook 'org-indent-mode)
+(setq org-directory "~/Org/"
+      org-agenda-files '("~/Org/agenda.org")
+      org-default-notes-file (expand-file-name "notes.org" org-directory)
+      org-ellipsis " ▼ "
+      org-log-done 'time
+      org-journal-dir "~/Org/journal/"
+      org-journal-date-format "%B %d, %Y (%A) "
+      org-journal-file-format "%Y-%m-%d.org"
+      org-hide-emphasis-markers t)
+(setq org-src-preserve-indentation nil
+      org-src-tab-acts-natively t
+      org-edit-src-content-indentation 0)
+
+(use-package org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+;; An example of how this works.
+;; [[arch-wiki:Name_of_Page][Description]]
+(setq org-link-abbrev-alist    ; This overwrites the default Doom org-link-abbrev-list
+        '(("google" . "http://www.google.com/search?q=")
+          ("arch-wiki" . "https://wiki.archlinux.org/index.php/")
+          ("ddg" . "https://duckduckgo.com/?q=")
+          ("wiki" . "https://en.wikipedia.org/wiki/")))
+(setq org-todo-keywords        ; This overwrites the default Doom org-todo-keywords
+        '((sequence
+           "TODO(t)"           ; A task that is ready to be tackled
+           "BLOG(b)"           ; Blog writing assignments
+           "GYM(g)"            ; Things to accomplish at the gym
+           "PROJ(p)"           ; A project that contains other tasks
+           "VIDEO(v)"          ; Video assignments
+           "WAIT(w)"           ; Something is holding up this task
+           "|"                 ; The pipe necessary to separate "active" states and "inactive" states
+           "DONE(d)"           ; Task has been completed
+           "CANCELLED(c)" )))  ; Task has been cancelled
+(setq org-src-fontify-natively t
+    org-src-tab-acts-natively t
+    org-confirm-babel-evaluate nil
+    org-edit-src-content-indentation 0)
+
+(use-package toc-org
+  :commands toc-org-enable
+  :init (add-hook 'org-mode-hook 'toc-org-enable))
+
+(setq org-blank-before-new-entry (quote ((heading . nil)
+                                         (plain-list-item . nil))))
+
+(use-package perspective
+  :bind
+  ("C-x C-b" . persp-list-buffers)   ; or use a nicer switcher, see below
+  :config
+  (persp-mode))
+
+(use-package projectile
+  :config
+  (projectile-global-mode 1))
+
+(nvmap :prefix "SPC"
+       "r c"   '(copy-to-register :which-key "Copy to register")
+       "r f"   '(frameset-to-register :which-key "Frameset to register")
+       "r i"   '(insert-register :which-key "Insert register")
+       "r j"   '(jump-to-register :which-key "Jump to register")
+       "r l"   '(list-registers :which-key "List registers")
+       "r n"   '(number-to-register :which-key "Number to register")
+       "r r"   '(counsel-register :which-key "Choose a register")
+       "r v"   '(view-register :which-key "View a register")
+       "r w"   '(window-configuration-to-register :which-key "Window configuration to register")
+       "r +"   '(increment-register :which-key "Increment register")
+       "r SPC" '(point-to-register :which-key "Point to register"))
+
+(setq scroll-conservatively 101) ;; value greater than 100 gets rid of half page jumping
+(setq mouse-wheel-scroll-amount '(3 ((shift) . 3))) ;; how many lines at a time
+(setq mouse-wheel-progressive-speed t) ;; accelerate scrolling
+(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
+
+(nvmap :prefix "SPC"
+       "e h"   '(counsel-esh-history :which-key "Eshell history")
+       "e s"   '(eshell :which-key "Eshell"))(use-package eshell-syntax-highlighting
+  :after esh-mode
+  :config
+  (eshell-syntax-highlighting-global-mode +1))
+
+(setq eshell-rc-script (concat user-emacs-directory "eshell/profile")
+      eshell-aliases-file (concat user-emacs-directory "eshell/aliases")
+      eshell-history-size 5000
+      eshell-buffer-maximum-lines 5000
+      eshell-hist-ignoredups t
+      eshell-scroll-to-bottom-on-input t
+      eshell-destroy-buffer-when-process-dies t
+      eshell-visual-commands'("bash" "fish" "htop" "ssh" "top" "zsh"))
+
+(winner-mode 1)
+(nvmap :prefix "SPC"
+       ;; Window splits
+       "w c"   '(evil-window-delete :which-key "Close window")
+       "w n"   '(evil-window-new :which-key "New window")
+       "w s"   '(evil-window-split :which-key "Horizontal split window")
+       "w v"   '(evil-window-vsplit :which-key "Vertical split window")
+       ;; Window motions
+       "w h"   '(evil-window-left :which-key "Window left")
+       "w j"   '(evil-window-down :which-key "Window down")
+       "w k"   '(evil-window-up :which-key "Window up")
+       "w l"   '(evil-window-right :which-key "Window right")
+       "w w"   '(evil-window-next :which-key "Goto next window")
+       ;; winner mode
+       "w <left>"  '(winner-undo :which-key "Winner undo")
+       "w <right>" '(winner-redo :which-key "Winner redo"))
+
+(use-package which-key
+  :init
+  (setq which-key-side-window-location 'bottom
+        which-key-sort-order #'which-key-key-order-alpha
+        which-key-sort-uppercase-first nil
+        which-key-add-column-padding 1
+        which-key-max-display-columns nil
+        which-key-min-display-lines 6
+        which-key-side-window-slot -10
+        which-key-side-window-max-height 0.25
+        which-key-idle-delay 0.8
+        which-key-max-description-length 25
+        which-key-allow-imprecise-window-fit t
+        which-key-separator " → " ))
+(which-key-mode)
+
+;; Make gc pauses faster by decreasing the threshold.
+(setq gc-cons-threshold (* 2 1000 1000))
+
+(use-package writeroom-mode)
