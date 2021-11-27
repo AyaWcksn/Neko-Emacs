@@ -5,9 +5,10 @@
 (tooltip-mode -1)
 (set-fringe-mode 10)
 
-(menu-bar-mode -1)
+(setq menu-bar-mode -1)
+(setq visible-bell t)
 
-;;(set-face-attribute 'default nil :font "Fira Code Retina" :height 100)
+(set-face-attribute 'default nil :font "Fira Code Retina" :height 100)
 
 (load-theme 'tango-dark)
 
@@ -23,9 +24,6 @@
 
 (require 'use-package)
 (setq use-package-always-ensure t)
-
-(use-package key-chord)
-(key-chord-mode 1)
 
 (use-package evil
   :init      ;; tweak evil's configuration before loading it
@@ -52,13 +50,6 @@
 (setq gc-cons-threshold 402653184
       gc-cons-percentage 0.6)
 
-(use-package ergoemacs-status)
-(ergoemacs-status-mode)    
-(use-package powerline)
-(powerline-nano-theme)
-(powerline-raw mode-line-mule-info nil 'l)
-
-
 ;; Profile emacs startup
 (add-hook 'emacs-startup-hook
           (lambda ()
@@ -84,7 +75,7 @@
   (setq dashboard-set-file-icons t)
   (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")
   ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-  (setq dashboard-startup-banner "~/.emacs.d/sinon.png")  ;; use custom image as banner
+  (setq dashboard-startup-banner "~/.emacs.d/mayu.png")  ;; use custom image as banner
   (setq dashboard-center-content nil) ;; set to 't' for centered content
   (setq dashboard-items '((recents . 5)
                           (agenda . 5 )
@@ -108,8 +99,6 @@
 (use-package all-the-icons-dired)
 (use-package dired-open)
 (use-package peep-dired)
-
-(use-package elcord)
 
 (nvmap :states '(normal visual) :keymaps 'override :prefix "SPC"
                "d d" '(dired :which-key "Open dired")
@@ -176,6 +165,8 @@
 (add-to-list 'default-frame-alist '(font . "Source Code Pro-11"))
 ;; changes certain keywords to symbols, such as lamda!
 (setq global-prettify-symbols-mode t)
+
+(use-package company)
 (use-package recentf
   :config
   (recentf-mode))
@@ -423,6 +414,26 @@
 (which-key-mode)
 
 ;; Make gc pauses faster by decreasing the threshold.
-(setq gc-cons-threshold (* 2 1000 1000))
+;; (setq gc-cons-threshold (* 2 1000 1000))
 
 (use-package writeroom-mode)
+
+;; lsp
+setq company-idle-delay 0)
+(setq company-minimum-prefix-length 1)
+
+;; Go - lsp-mode
+;; Set up before-save hooks to format buffer and add/delete imports.
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+;; Start LSP Mode and YASnippet mode
+(add-hook 'go-mode-hook #'lsp-deferred)
+(add-hook 'go-mode-hook #'yas-minor-mode)
+(use-package yasnippets)
+(use-package lsp-ui)
+(use-package lsp-mode)
+(use-package company-mode)
+(use-package go-mode)
